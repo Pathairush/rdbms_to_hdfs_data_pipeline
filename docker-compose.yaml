@@ -25,9 +25,9 @@ services:
                 max-size: 10m
                 max-file: "3"
         volumes:
-            - ./airflow/dags:/usr/local/airflow/dags
-            - ./airflow/plugins:/usr/local/airflow/plugins
-            - ./airflow/scripts:/usr/local/airflow/scripts
+            - ${PWD}/airflow/dags:/usr/local/airflow/dags
+            - ${PWD}/airflow/plugins:/usr/local/airflow/plugins
+            - ${PWD}/airflow/scripts:/usr/local/airflow/scripts
         ports:
             - "8080:8080"
         command: webserver
@@ -37,13 +37,13 @@ services:
             timeout: 30s
             retries: 3
     database:
-          image: postgres
+          image: postgres:9.6
           environment:
             - POSTGRES_DB=lineman_wongnai
             - POSTGRES_PASSWORD=passw0rd
             - PGDATA=/var/lib/postgresql/data/pgdata
           volumes:
-            - ./data:/var/lib/postgresql/data/lmwn
+            - ${PWD}/data:/var/lib/postgresql/data/lmwn
           logging:
               options:
                 max-size: 10m
