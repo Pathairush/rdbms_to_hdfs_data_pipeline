@@ -19,6 +19,7 @@ services:
         environment:
             - LOAD_EX=n
             - EXECUTOR=Local
+            - AIRFLOW_CONN_POSTGRES_DB=postgres://postgres:passw0rd@database:5432/lineman_wongnai
         logging:
             options:
                 max-size: 10m
@@ -26,6 +27,7 @@ services:
         volumes:
             - ./airflow/dags:/usr/local/airflow/dags
             - ./airflow/plugins:/usr/local/airflow/plugins
+            - ./airflow/scripts:/usr/local/airflow/scripts
         ports:
             - "8080:8080"
         command: webserver
@@ -34,15 +36,16 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-  
-  database:
-        image: postgres:9.6
-        environment:
-            - POSTGRES_USER=pathairs
-            - POSTGRES_PASSWORD=passw0rd
+    database:
+          image: postgres
+          environment:
             - POSTGRES_DB=lineman_wongnai
-        logging:
-            options:
+            - POSTGRES_PASSWORD=passw0rd
+            - PGDATA=/var/lib/postgresql/data/pgdata
+          volumes:
+            - ./data:/var/lib/postgresql/data/lmwn
+          logging:
+              options:
                 max-size: 10m
                 max-file: "3"
 
