@@ -48,5 +48,23 @@ services:
               options:
                 max-size: 10m
                 max-file: "3"
+    hive:
+        image: cloudera/quickstart:latest
+        container_name: hive-docker
+        restart: always
+        depends_on:
+            - database
+        ports:
+            - 8888:8888
+            - 10000:10000
+            - 7180:7180
+            - 8020:8020
+        hostname: quickstart.cloudera
+        privileged: true
+        tty: true
+        command: /usr/bin/docker-quickstart
+        volumes:
+            - ${PWD}/driver/postgresql-42.2.19.jre6.jar:/var/lib/sqoop/postgresql-42.2.19.jre6.jar
+
 
   
