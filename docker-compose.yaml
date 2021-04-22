@@ -10,7 +10,6 @@ services:
             options:
                 max-size: 10m
                 max-file: "3"
-
     webserver:
         image: puckel/docker-airflow:1.10.9
         restart: always
@@ -48,23 +47,85 @@ services:
               options:
                 max-size: 10m
                 max-file: "3"
-    hive:
-        image: cloudera/quickstart:latest
-        container_name: hive-docker
-        restart: always
-        depends_on:
-            - database
-        ports:
-            - 8888:8888
-            - 10000:10000
-            - 7180:7180
-            - 8020:8020
-        hostname: quickstart.cloudera
-        privileged: true
-        tty: true
-        command: /usr/bin/docker-quickstart
+    namenode:
+        image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
+        container_name: hive-namenode
         volumes:
-            - ${PWD}/driver/postgresql-42.2.19.jre6.jar:/var/lib/sqoop/postgresql-42.2.19.jre6.jar
-
-
+            - namenode:/hadoop/dfs/name
+        environment:
+            - CLUSTER_NAME=test
+        env_file:
+            - ./hadoop-hive.env
+        ports:
+            - "50070:50070"
+    datanode:
+        image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
+        volumes:
+            - datanode:/hadoop/dfs/data
+        env_file:
+            - ./hadoop-hive.env
+        environment:
+            SERVICE_PRECONDITION: "namenode:50070"
+        ports:
+            - "50075:50075"
+    hive-metastore-postgresql:
+        image: bde2020/hive-metastore-postgresql:2.3.0
+    hive-metastore:
+        image: bde2020/hive:2.3.2-postgresql-metastore
+        env_file:
+            - ./hadoop-hive.env
+        command: /opt/hive/bin/hive --service metastore
+        environment:
+            SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
+        ports:
+            - "9083:9083"
+    hive-server:
+        image: bde2020/hive:2.3.2-postgresql-metastore
+        container_name: hive-server
+        env_file:
+            - ./hadoop-hive.env
+        environment:
+            HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+            SERVICE_PRECONDITION: "hive-metastore:9083"
+        ports:
+            - "10000:10000"
+        volumes:
+            - ${PWD}/data:/opt/hive/examples/files/lmwn
+    spark-master:
+        image: bde2020/spark-master:3.1.1-hadoop3.2
+        container_name: spark-master
+        ports:
+            - "8079:8080"
+            - "7077:7077"
+        environment:
+            - INIT_DAEMON_STEP=setup_spark
+    spark-worker-1:
+        image: bde2020/spark-worker:3.1.1-hadoop3.2
+        container_name: spark-worker-1
+        depends_on:
+            - spark-master
+        ports:
+            - "8081:8081"
+        environment:
+            - "SPARK_MASTER=spark://spark-master:7077"
+    spark-worker-2:
+        image: bde2020/spark-worker:3.1.1-hadoop3.2
+        container_name: spark-worker-2
+        depends_on:
+            - spark-master
+        ports:
+            - "8082:8081"
+        environment:
+            - "SPARK_MASTER=spark://spark-master:7077"
+    spark-submit:
+        image: bde2020/spark-submit:3.1.1-hadoop3.2
+        depends_on:
+            - spark-master
+        environment:
+            - "SPARK_MASTER=spark://spark-master:7077"
+            - INIT_DAEMON_STEP=false
+        
+volumes:
+    namenode:
+    datanode:
   
