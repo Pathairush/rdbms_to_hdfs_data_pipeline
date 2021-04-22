@@ -2,6 +2,7 @@ import datetime
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.bash_operator import BashOperator
 
 import sys
 sys.path.append('/usr/local/airflow/scripts')
@@ -80,5 +81,24 @@ postgres_data_quality_check = PostgresDataQualityOperator(
     data_quality_checks = sql_queries.postgres_data_quality_check
 )
 
+install_sqoop = BashOperator(
+    task_id = 'install_sqoop',
+    bash_command = 'docker exec hive-server bash /opt/sqoop/install_sqoop.sh ',
+    dag = dag
+)
+
+import_sqoop = BashOperator(
+    task_id = 'import_sqoop',
+    bash_command = 'docker exec hive-server bash /opt/sqoop/import_sqoop.sh ',
+    dag = dag
+)
+
+list_sqoop_data = BashOperator(
+    task_id = 'list_sqoop_data',
+    bash_command = 'docker exec hive-server hdfs dfs -ls /user/sqoop ',
+    dag = dag
+)
+
 start >> drop_order_detail >> create_order_detail >> copy_order_detail_data >> postgres_data_quality_check
 start >> drop_restaurant_detail >> create_restaurant_detail >> copy_restaurant_detail_data >> postgres_data_quality_check
+postgres_data_quality_check >> install_sqoop >> import_sqoop >> list_sqoop_data

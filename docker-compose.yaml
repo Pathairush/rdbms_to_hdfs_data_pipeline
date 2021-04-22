@@ -11,8 +11,9 @@ services:
                 max-size: 10m
                 max-file: "3"
     webserver:
-        image: puckel/docker-airflow:1.10.9
+        image: modified_puckle_airflow:latest
         restart: always
+        privileged: true
         depends_on:
             - postgres
         environment:
@@ -27,6 +28,7 @@ services:
             - ${PWD}/airflow/dags:/usr/local/airflow/dags
             - ${PWD}/airflow/plugins:/usr/local/airflow/plugins
             - ${PWD}/airflow/scripts:/usr/local/airflow/scripts
+            - /var/run/docker.sock:/var/run/docker.sock
         ports:
             - "8080:8080"
         command: webserver
