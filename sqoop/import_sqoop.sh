@@ -1,4 +1,4 @@
-hdfs dfs -rm -r /user/sqoop
+hdfs dfs -rmdir /user/sqoop
 hdfs dfs -mkdir /user/sqoop
 
 /usr/lib/sqoop/bin/sqoop import \
@@ -6,24 +6,19 @@ hdfs dfs -mkdir /user/sqoop
 --table order_detail \
 --username postgres \
 --password passw0rd \
---m 1 \
+--num-mappers 1 \
+--map-column-hive order_created_timestamp=STRING,status=STRING,price=INT,discount=FLOAT,id=STRING,driver_id=STRING,user_id=STRING,restaurant_id=STRING \
 --target-dir /user/sqoop/order_detail \
+
 
 /usr/lib/sqoop/bin/sqoop import \
 --connect jdbc:postgresql://database:5432/lineman_wongnai \
 --table restaurant_detail \
 --username postgres \
 --password passw0rd \
---m 1 \
+--num-mappers 1 \
 --target-dir /user/sqoop/restaurant_detail \
 
-# /usr/lib/sqoop/bin/sqoop import-all-tables \
-# --connect jdbc:postgresql://database:5432/lineman_wongnai \
-# --username postgres \
-# --password passw0rd  \
-# --num-mappers 1 \
-# --hive-import \
-# --hive-overwrite \
-# --create-hive-table \
-# --hive-database lineman_wongnai \
-# --warehouse-dir /user/sqoop/lineman_wongnai
+rm -r /opt/spark
+mkdir /opt/spark
+hdfs dfs -get /user/sqoop/* /opt/spark/

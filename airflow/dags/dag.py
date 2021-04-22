@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.bash_operator import BashOperator
+from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
 
 import sys
 sys.path.append('/usr/local/airflow/scripts')
@@ -93,12 +94,18 @@ import_sqoop = BashOperator(
     dag = dag
 )
 
-list_sqoop_data = BashOperator(
-    task_id = 'list_sqoop_data',
-    bash_command = 'docker exec hive-server hdfs dfs -ls /user/sqoop ',
-    dag = dag
+spark_transform_order_table = BashOperator(
+    task_id = 'spark_transform_order_table',
+    dag = dag,
+    bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_transform_order_table /home/script/transform_order_table.py '
+)
+
+spark_transform_restaurant_table = BashOperator(
+    task_id = 'spark_transform_restaurant_table',
+    dag = dag,
+    bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_transform_restaurant_table /home/script/transform_restaurant_table.py '
 )
 
 start >> drop_order_detail >> create_order_detail >> copy_order_detail_data >> postgres_data_quality_check
 start >> drop_restaurant_detail >> create_restaurant_detail >> copy_restaurant_detail_data >> postgres_data_quality_check
-postgres_data_quality_check >> install_sqoop >> import_sqoop >> list_sqoop_data
+postgres_data_quality_check >> install_sqoop >> import_sqoop >> [ spark_transform_order_table, spark_transform_restaurant_table]
