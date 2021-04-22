@@ -1,0 +1,3 @@
+hdfs dfs -mkdir /user/sqoop
+/usr/lib/sqoop/bin/sqoop import --connect jdbc:postgresql://database:5432/lineman_wongnai --table order_detail --username postgres --password passw0rd --m 1 --target-dir /user/sqoop/order_detail
+/usr/lib/sqoop/bin/sqoop import --connect jdbc:postgresql://database:5432/lineman_wongnai --table restaurant_detail --username postgres --password passw0rd --m 1 --target-dir /user/sqoop/restaurant_detail
