@@ -16,15 +16,15 @@ default_args = {
 }
 
 dag = DAG(
-    'example_dag',
+    'hands_on_test',
     default_args = default_args,
     description = 'lineman wongnai data engineer test',
-    start_date = datetime.datetime(2021, 4, 21, 0, 0, 0),
-    schedule_interval = None
+    start_date = datetime.datetime(2021, 4, 23, 0, 0, 0),
+    schedule_interval = '@daily'
 )
 
 start = DummyOperator(
-    task_id = 'load_data_to_postgres',
+    task_id = 'start',
     dag = dag
 )
 
@@ -119,8 +119,44 @@ create_hive_restaurant_detail = BashOperator(
     bash_command = 'docker exec hive-server hive -f /opt/hql/restaurant_detail.hql '
 )
 
+spark_create_order_detail_new = BashOperator(
+    task_id = 'spark_create_order_detail_new',
+    dag = dag,
+    bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_create_order_detail_new /home/script/create_order_detail_new.py '
+)
+
+spark_create_restaurant_detail_new = BashOperator(
+    task_id = 'spark_create_restaurant_detail_new',
+    dag = dag,
+    bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_create_restaurant_detail_new /home/script/create_restaurant_detail_new.py '
+)
+
+create_hive_order_detail_new = BashOperator(
+    task_id = 'create_hive_order_detail_new',
+    dag = dag,
+    bash_command = 'docker exec hive-server hive -f /opt/hql/order_detail_new.hql '
+)
+
+create_hive_restaurant_detail_new = BashOperator(
+    task_id = 'create_hive_restaurant_detail_new',
+    dag = dag,
+    bash_command = 'docker exec hive-server hive -f /opt/hql/restaurant_detail_new.hql '
+)
+
+generate_sql_requirement = BashOperator(
+    task_id = 'generate_sql_requirement',
+    dag = dag,
+    bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_create_restaurant_detail_new /home/script/sql_requirement.py '
+)
+
+end = DummyOperator(
+    task_id = 'end',
+    dag = dag
+)
 start >> drop_order_detail >> create_order_detail >> copy_order_detail_data >> postgres_data_quality_check
 start >> drop_restaurant_detail >> create_restaurant_detail >> copy_restaurant_detail_data >> postgres_data_quality_check
 postgres_data_quality_check >> install_sqoop >> import_sqoop >> [ spark_transform_order_table, spark_transform_restaurant_table]
-spark_transform_order_table >> create_hive_order_detail
-spark_transform_restaurant_table >> create_hive_restaurant_detail
+
+spark_transform_order_table >> spark_create_order_detail_new >> create_hive_order_detail >> create_hive_order_detail_new
+spark_transform_restaurant_table >> spark_create_restaurant_detail_new >> create_hive_restaurant_detail >> create_hive_restaurant_detail_new
+[create_hive_order_detail_new, create_hive_restaurant_detail_new] >> generate_sql_requirement >> end

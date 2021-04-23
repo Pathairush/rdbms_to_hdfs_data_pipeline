@@ -93,6 +93,7 @@ services:
             SERVICE_PRECONDITION: "hive-metastore:9083"
         ports:
             - "10000:10000"
+            - "10002:10002"
         volumes:
             - ${PWD}/airflow/others/sqoop:/opt/sqoop
             - ${PWD}/airflow/scripts/hql:/opt/hql
@@ -106,6 +107,7 @@ services:
             - INIT_DAEMON_STEP=setup_spark
         volumes:
             - ${PWD}/airflow/scripts/spark:/home/script
+            - ${PWD}/sql_result:/home/sql_result
     spark-worker-1:
         image: bde2020/spark-worker:3.1.1-hadoop3.2
         container_name: spark-worker-1
