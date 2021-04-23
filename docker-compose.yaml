@@ -2,6 +2,7 @@ version: '3.7'
 services:
     postgres:
         image: postgres:9.6
+        container_name: postgres-airflow
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
@@ -41,6 +42,7 @@ services:
             retries: 3
     database:
           image: postgres:9.6
+          container_name: postgres-db
           environment:
             - POSTGRES_DB=lineman_wongnai
             - POSTGRES_PASSWORD=passw0rd
@@ -129,5 +131,3 @@ services:
 volumes:
     namenode:
     datanode:
-    hdfs:
-  

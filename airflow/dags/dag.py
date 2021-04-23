@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.contrib.operators.spark_submit_operator import SparkSubmitOperator
+from airflow.utils.dates import days_ago
 
 import sys
 sys.path.append('/usr/local/airflow/scripts')
@@ -12,14 +12,16 @@ from data_quality import PostgresDataQualityOperator
 import sql_queries
 
 default_args = {
-    'owner' : 'pathairs'
+    'owner' : 'pathairs',
+    'retries'  : 1,
+    'retry_delay' : datetime.timedelta(minutes=3),
 }
 
 dag = DAG(
     'hands_on_test',
     default_args = default_args,
     description = 'lineman wongnai data engineer test',
-    start_date = datetime.datetime(2021, 4, 23, 0, 0, 0),
+    start_date = days_ago(1),
     schedule_interval = '@daily'
 )
 
