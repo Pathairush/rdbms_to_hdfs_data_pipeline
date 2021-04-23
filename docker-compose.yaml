@@ -94,7 +94,7 @@ services:
             HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
             SERVICE_PRECONDITION: "hive-metastore:9083"
         ports:
-            - "10001:10000"
+            - "10000:10000"
             - "10002:10002"
         volumes:
             - ${PWD}/airflow/others/sqoop:/opt/sqoop
