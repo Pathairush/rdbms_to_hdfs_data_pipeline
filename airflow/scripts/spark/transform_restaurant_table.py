@@ -2,7 +2,10 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 
-spark = SparkSession.builder.enableHiveSupport().getOrCreate()
+# writeLegacyFormat is to make a spark decimal type works with hive decimal type.
+spark = SparkSession.builder\
+.config("spark.sql.parquet.writeLegacyFormat",True)\
+.enableHiveSupport().getOrCreate()
 
 df = spark.read.csv('hdfs://hive-namenode:8020/user/sqoop/restaurant_detail/part-m-00000', header=False)
 rename = {

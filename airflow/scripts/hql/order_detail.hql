@@ -1,20 +1,23 @@
 DROP TABLE IF EXISTS order_detail;
 
--- HIVE CANNOT READ TIMESTAMP FOR PARQUET FILE FORMAT -> https://issues.apache.org/jira/browse/HIVE-15079
--- WORKAROUND HERE -> https://stackoverflow.com/questions/60492836/timestamp-not-behaving-as-intended-with-parquet-in-hive 
 CREATE EXTERNAL TABLE IF NOT EXISTS order_detail (
-    order_created_timestamp STRING,
+    order_created_timestamp TIMESTAMP,
     status STRING,
     price INT,
-    discount DOUBLE,
+    discount FLOAT,
     id STRING,
     driver_id STRING,
     user_id STRING,
     restaurant_id STRING
 )
-ROW FORMAT DELIMITED
-FIELDS TERMINATED BY ','
+PARTITIONED BY (dt STRING)
 STORED AS PARQUET
-LOCATION '/user/sqoop/order_detail';
+LOCATION '/user/spark/transformed_order_detail';
+
+MSCK REPAIR TABLE order_detail;
 
 SELECT COUNT(*) FROM order_detail;
+
+SELECT * FROM order_detail LIMIT 5;
+
+SHOW CREATE TABLE order_detail;

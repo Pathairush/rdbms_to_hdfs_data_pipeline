@@ -19,7 +19,8 @@ dag = DAG(
     'example_dag',
     default_args = default_args,
     description = 'lineman wongnai data engineer test',
-    start_date = datetime.datetime(2021, 4, 21, 0, 0, 0)
+    start_date = datetime.datetime(2021, 4, 21, 0, 0, 0),
+    schedule_interval = None
 )
 
 start = DummyOperator(
@@ -106,6 +107,20 @@ spark_transform_restaurant_table = BashOperator(
     bash_command = 'docker exec spark-master /spark/bin/spark-submit --master local[*] --name spark_transform_restaurant_table /home/script/transform_restaurant_table.py '
 )
 
+create_hive_order_detail = BashOperator(
+    task_id = 'create_hive_order_detail',
+    dag = dag,
+    bash_command = 'docker exec hive-server hive -f /opt/hql/order_detail.hql '
+)
+
+create_hive_restaurant_detail = BashOperator(
+    task_id = 'create_hive_restaurant_detail',
+    dag = dag,
+    bash_command = 'docker exec hive-server hive -f /opt/hql/restaurant_detail.hql '
+)
+
 start >> drop_order_detail >> create_order_detail >> copy_order_detail_data >> postgres_data_quality_check
 start >> drop_restaurant_detail >> create_restaurant_detail >> copy_restaurant_detail_data >> postgres_data_quality_check
 postgres_data_quality_check >> install_sqoop >> import_sqoop >> [ spark_transform_order_table, spark_transform_restaurant_table]
+spark_transform_order_table >> create_hive_order_detail
+spark_transform_restaurant_table >> create_hive_restaurant_detail
