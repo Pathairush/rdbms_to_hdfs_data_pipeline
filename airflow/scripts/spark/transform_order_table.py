@@ -4,7 +4,7 @@ import pyspark.sql.types as T
 
 spark = SparkSession.builder.enableHiveSupport().getOrCreate()
 
-df = spark.read.csv('/home/spark/order_detail/part-m-00000', header=False)
+df = spark.read.csv("hdfs://hive-namenode:8020/user/sqoop/order_detail/part-m-00000", header=False)
 rename = {
     '_c0' : 'order_created_timestamp',
     '_c1' : 'status',
@@ -20,4 +20,5 @@ df = df.withColumn('order_created_timestamp', F.to_timestamp('order_created_time
 df = df.withColumn('dt', F.date_format('order_created_timestamp', "yyyyMMdd"))
 df = df.withColumn('price', F.col('price').cast(T.IntegerType()))
 df = df.withColumn('discount', F.col('discount').cast(T.FloatType()))
-df.write.parquet('/home/spark/transformed_order_detail', partitionBy='dt', mode='overwrite')
+df.write.parquet('hdfs://hive-namenode:8020/user/spark/transformed_order_detail', partitionBy='dt', mode='overwrite')
+
