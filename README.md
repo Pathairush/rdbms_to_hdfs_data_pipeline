@@ -9,7 +9,7 @@ Hi Lineman Wongnai team :wave: , Thanks for giving me the opportunity to take a 
 
 # Architecture compatability
 - [X] `linux/amd64`
-- [] `arm64`
+- [ ] `arm64`
 
 # How to run this project
 I provide you a docker-compose file so that you can run the whole application with the following command.
