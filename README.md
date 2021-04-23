@@ -8,8 +8,8 @@ Hi Lineman Wongnai team :wave: , Thanks for giving me the opportunity to take a 
 2. Docker compose
 
 # Architecture compatability
-1. - [X] `linux/amd64`
-2. - [] `arm64`
+- [X] `linux/amd64`
+- [] `arm64`
 
 # How to run this project
 I provide you a docker-compose file so that you can run the whole application with the following command.
