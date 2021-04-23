@@ -11,7 +11,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS restaurant_detail_new (
 )
 PARTITIONED BY (dt STRING)
 STORED AS PARQUET
-LOCATION '/user/spark/restaurant_detail_new.hql';
+LOCATION '/user/spark/restaurant_detail_new';
 
 MSCK REPAIR TABLE restaurant_detail_new;
 
