@@ -1,5 +1,7 @@
 # RDBMS to HDFS data pipeline
 
+![img](./image/rdbms_to_hdfs.png)
+
 This project aims to move the data from a Relational database system (RDBMS) to a Hadoop file system (HDFS). Here are the technology stacks we will use in this project.
 - PostgreSQL 
 - Apache Sqoop
