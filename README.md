@@ -1,6 +1,18 @@
-# Lineman Wongnai Data Engineer Test
+# RDBMS to HDFS data pipeline
 
-Hi Lineman Wongnai team :wave: , Thanks for giving me the opportunity to take a test for data engineer position. Here is the summary of this project.
+This project aims to move the data from a Relational database system (RDBMS) to a Hadoop file system (HDFS). Here are the technology stacks we will use in this project.
+- PostgreSQL 
+- Apache Sqoop
+- Apache Hive
+- Apache Spark
+
+# The learning objectives 
+1. To create a modified `docker` file based on your use cases.
+2. To know how to set up the component with `docker` in both traditional and distributed environments.
+3. To craft a data pipeline for moving data from the traditional system to the distributed system.
+4. To learn how to communicate between containers in the same environment.
+5. To build data quality checkers in the intermediate step of the data pipeline.
+6. To be familiar with the basic usage of `sqoop`, `hive`, and `spark`.
 
 # Required
 
@@ -9,7 +21,6 @@ Hi Lineman Wongnai team :wave: , Thanks for giving me the opportunity to take a 
 
 # Architecture compatability
 - [X] `linux/amd64`
-- [ ] `arm64`
 
 # How to run this project
 I provide you a docker-compose file so that you can run the whole application with the following command.
