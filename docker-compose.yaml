@@ -21,7 +21,7 @@ services:
         environment:
             - LOAD_EX=n
             - EXECUTOR=Local
-            - AIRFLOW_CONN_POSTGRES_DB=postgres://postgres:passw0rd@database:5432/lineman_wongnai
+            - AIRFLOW_CONN_POSTGRES_DB=postgres://postgres:passw0rd@database:5432/temp_db
             - AIRFLOW_CONN_SPARK=spark://spark-master:7077
         logging:
             options:
@@ -44,7 +44,7 @@ services:
           image: postgres:9.6
           container_name: postgres-db
           environment:
-            - POSTGRES_DB=lineman_wongnai
+            - POSTGRES_DB=temp_db
             - POSTGRES_PASSWORD=passw0rd
             - PGDATA=/var/lib/postgresql/data/pgdata
           volumes:
